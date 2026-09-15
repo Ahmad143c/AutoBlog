@@ -1,0 +1,40 @@
+# Auto-generated .gitignore for AutoBlog
+# Node.js & npm
+node_modules/
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-store/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!apps/*/.env.example
+
+# Build output
+dist/
+build/
+.out/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Deployment
+.vercel/
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
+
+# Misc
+coverage/
+.sass-cache/
+.cache/
+.tmp/

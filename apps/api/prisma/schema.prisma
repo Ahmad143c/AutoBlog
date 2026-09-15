@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  clerkId   String     @unique
+  email     String     @unique
+  name      String
+  password  String
+  groqApiKey String?
+  plan      Plan       @default(FREE)
+  sites     Site[]
+  posts     Post[]
+  workflows Workflow[]
+  socialAccounts SocialAccount[]
+  createdAt DateTime   @default(now())
+}
+
+model Site {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  name        String
+  url         String
+  platform    Platform
+  credentials Json
+  status      SiteStatus @default(ACTIVE)
+  posts       Post[]
+  workflows   Workflow[]
+  socialAccounts SocialAccount[]
+  createdAt   DateTime   @default(now())
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  siteId      String
+  site        Site       @relation(fields: [siteId], references: [id])
+  title       String
+  slug        String
+  content     String     @db.Text
+  excerpt     String?
+  keywords    String[]
+  categories  String[]
+  tags        String[]
+  tone        String
+  wordCount   Int
+  status      PostStatus @default(DRAFT)
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  wpPostId    Int?
+  featuredImageUrl String?
+  featuredMediaId Int?
+  n8nRunId    String?
+  errorLog    String?
+  metaDescription   String?
+  seoTitle          String?
+  focusKeyword      String?
+  schemaMarkup      String?  @db.Text
+  readabilityScore  Int?
+  socialShares SocialShare[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Workflow {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  siteId        String
+  site          Site      @relation(fields: [siteId], references: [id])
+  n8nWorkflowId String
+  name          String
+  schedule      String
+  topic         String
+  keywords      String[]
+  tone          String
+  wordCount     Int
+  scheduleData  Json?
+  isActive      Boolean   @default(true)
+  lastRunAt     DateTime?
+  createdAt     DateTime  @default(now())
+}
+
+enum Platform {
+  WORDPRESS
+  NEXTJS
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHING
+  PUBLISHED
+  FAILED
+}
+
+enum SiteStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+enum Plan {
+  FREE
+  PRO
+  AGENCY
+}
+
+model SocialAccount {
+  id           String         @id @default(cuid())
+  userId       String
+  user         User           @relation(fields: [userId], references: [id])
+  siteId       String         // linked to specific site
+  site         Site           @relation(fields: [siteId], references: [id])
+  platform     SocialPlatform
+  accountName  String         // e.g. "My Facebook Page", "@mybrand"
+  credentials  Json           // encrypted per-platform credentials
+  isActive     Boolean        @default(true)
+  expiresAt    DateTime?
+  createdAt    DateTime       @default(now())
+
+  socialShares SocialShare[]
+  @@unique([siteId, platform])
+}
+
+model SocialShare {
+  id              String         @id @default(cuid())
+  postId          String
+  post            Post           @relation(fields: [postId], references: [id])
+  socialAccountId String
+  socialAccount   SocialAccount  @relation(fields: [socialAccountId], references: [id])
+  platform        SocialPlatform
+  shareId         String?
+  shareUrl        String?
+  status          ShareStatus    @default(PENDING)
+  caption         String?        @db.Text
+  error           String?
+  sharedAt        DateTime?
+  createdAt       DateTime       @default(now())
+}
+
+enum SocialPlatform {
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+  TWITTER
+  THREADS
+  YOUTUBE
+}
+
+enum ShareStatus {
+  PENDING
+  SHARED
+  FAILED
+}
+
