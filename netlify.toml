@@ -1,0 +1,13 @@
+[build]
+  command = "pnpm --filter @autoblog/web build"
+  publish = "apps/web/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_FLAGS = "--shamefully-hoist"
+
+# SPA fallback so client-side routes don't 404
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
