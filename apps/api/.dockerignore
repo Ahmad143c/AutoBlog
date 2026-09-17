@@ -1,0 +1,11 @@
+node_modules
+dist
+uploads
+.env
+.env.local
+.git
+.gitignore
+pnpm-lock.yaml
+README.md
+check_db.ts
+scratch
